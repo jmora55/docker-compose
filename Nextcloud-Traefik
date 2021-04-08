@@ -1,0 +1,70 @@
+version: '3'
+
+####Make sure to create volumes in docker EX: sudo docker volume create "name"####
+volumes:
+  nextcloud:
+  db:
+
+####Create your networks in docker and replace or keep format but create the network EX: sudo docker network create "name"####
+networks:
+  proxy:
+    external: true
+  nextcloud_backend:
+    external: false
+
+services:
+  db:
+    image: mariadb
+    restart: always
+    networks:
+      - proxy
+      - nextcloud_backend
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=testing
+      - MYSQL_PASSWORD=testing
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+
+  app:
+    image: nextcloud
+    restart: always
+    networks:
+      - proxy
+      - nextcloud_backend
+    links:
+      - db
+    volumes:
+      - nextcloud:/var/www/html
+    environment:
+      - MYSQL_PASSWORD=testing
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - MYSQL_HOST=db
+
+####Replace yourdomain in the fields below EX: nextcloud.localhost or mydomain.com####
+    labels:
+      - traefik.enable=true
+      - traefik.http.middlewares.nextcloud-redirect-websecure.redirectscheme.scheme=https
+      - traefik.http.routers.nextcloud-web.middlewares=ghost-redirect-websecure
+      - traefik.http.routers.nextcloud-web.rule=Host(`yourdomain`)
+      - traefik.http.routers.nextcloud-web.entrypoints=web
+      - traefik.http.routers.nextcloud-web-secure.rule=Host(`yourdomain`)
+      - traefik.http.routers.nextcloud-web-secure.tls.certresolver=leresolver
+      - traefik.http.routers.nextcloud-web-secure.tls=true
+      - traefik.http.routers.nextcloud-web-secure.entrypoints=websecure
+
+networks:
+  proxy:
+    external: true
+  nextcloud_backend:
+    external: false
+
+volumes:
+ nextcloud:
+   external: true
+ db:
+   external: true
+
