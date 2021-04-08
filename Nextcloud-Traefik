@@ -68,3 +68,40 @@ volumes:
  db:
    external: true
 
+
+
+
+
+
+
+#### Only copy until line 69 for yml####
+
+#### NOTE: you will have to modify the config/config.php file to add your domain for it to connect! #### #### Follow Steps ↓ ####
+
+once you have run: sudo docker-compose up -d
+
+run: sudo docker ps -a
+
+look for the nextcloud container name then copy container name and run → sudo docker exec -it containername /bin/bash
+
+once in container run apt-get update → then apt-get upgrade, → then apt-get install nano
+
+then cd to /var/www/html/config then → nano config.php
+
+look for:
+
+ 'trusted_domains' =>
+  array (
+    0 => 'localhost',
+    
+    and add other domains like example below
+    
+    'trusted_domains' =>
+  array (
+   0 => 'localhost',
+   1 => 'nextcloud.mydomain.com',
+   2 => '192.168.1.50',
+   3 => '[fe80::1:50]',
+),
+
+then just control+X to save and type url in browser. Should be reachable now EX: Nexcloud.mydomain.com
