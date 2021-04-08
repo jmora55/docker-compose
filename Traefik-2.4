@@ -1,0 +1,35 @@
+version: "3"
+
+services:
+  traefik:
+    image: "traefik:v2.4"
+    command:
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --providers.docker
+      - --api=true
+      - --api.insecure=true
+      - --api.dashboard=true
+      - --providers.docker.exposedbydefault=false
+      - --certificatesresolvers.leresolver.acme.caserver=https://acme-v02.api.letsencrypt.org/directory
+      - --certificatesresolvers.leresolver.acme.email=youremail@here.com
+      - --certificatesresolvers.leresolver.acme.storage=/acme.json
+      - --certificatesresolvers.leresolver.acme.tlschallenge=true
+    ports:
+      - "80:80"
+      - "443:443"
+      - "9000:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./acme2.json:/acme.json"
+    labels:
+      traefik.http.routers.http_catchall.rule: HostRegexp(`{host:.+}`)
+      traefik.http.routers.http_catchall.entrypoints: web
+      traefik.http.routers.http_catchall.middlewares: https_redirect
+      traefik.http.middlewares.https_redirect.redirectscheme.scheme: https
+      traefik.http.middlewares.https_redirect.redirectscheme.permanent: true
+    networks:
+      - proxy
+networks:
+  proxy:
+    external: true
