@@ -1,6 +1,6 @@
 version: '3'
 
-####Make sure to create volumes in docker EX: sudo docker volume create "name"####
+####Make sure to create volumes in docker EX: sudo docker volume create --name="name"####
 volumes:
   nextcloud:
   db:
