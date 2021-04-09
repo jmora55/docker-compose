@@ -105,3 +105,5 @@ look for:
 ),
 
 then just control+X to save and type url in browser. Should be reachable now EX: Nexcloud.mydomain.com
+
+NOTE:  Make sure to enable port in Firewall for DB or it will get blocked if firewall is up. If you get error gateway error, you haven't enabled port for your docker zone in FW
